@@ -1,0 +1,25 @@
+{
+	"name"       : "intellex/filesystem",
+	"license"    : "MIT",
+	"authors"    : [
+		{
+			"name" : "Ivan Sabo",
+			"email": "sabo@intellex.rs"
+		}
+	],
+	"autoload"   : {
+		"psr-4": {
+			"Intellex\\Filesystem\\": "src\\"
+		}
+	},
+	"suggest"    : {
+		"ext-fileinfo": "Provides more reliable mime type reading"
+	},
+	"require"    : {
+		"ralouphie/mimey": "^1.0"
+	},
+	"require-dev": {
+		"intellex/debugger": "*"
+	}
+
+}

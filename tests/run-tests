@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Check the directory
+if [ ! -f test.php ]; then
+	echo "Please call from the 'tests' directory."
+	exit 255
+fi
+
+# Clear the tmp dir and copy everything from the skel directory
+chmod 777 -R tmp/
+rm -rf tmp/*
+cp -r skel/* tmp/
+
+# Set the privileges
+chmod 400 tmp/non-writable/file
+chmod 400 tmp/read-only
+chmod 000 tmp/non-readable
+chmod 500 tmp/non-writable
+
+# Run PHP tests
+php -f test.php
+
+# Clear the tmp directory
+chmod 777 -R tmp/
+rm -rf tmp/*
