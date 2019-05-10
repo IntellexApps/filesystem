@@ -66,7 +66,7 @@ abstract class Path {
 	/**
 	 * Initialize file or directory.
 	 *
-	 * @param string $path The path to the file or directory.
+	 * @param string|string[] $path The path to the file or directory.
 	 */
 	public function __construct($path) {
 		$this->init($path);
@@ -75,7 +75,7 @@ abstract class Path {
 	/**
 	 * Initialize the path.
 	 *
-	 * @param string $path The path to the file or directory.
+	 * @param string|string[] $path The path to the file or directory.
 	 */
 	protected function init($path) {
 		$this->path = static::realPath($path);
@@ -135,11 +135,16 @@ abstract class Path {
 	/**
 	 * Get the cleaned up path.
 	 *
-	 * @param Path|string $path The to get the real path from.
+	 * @param Path|string|string[] $path The to get the real path from.
 	 *
 	 * @return string The true and absolute path, without trailing slash.
 	 */
 	public static function realPath($path) {
+
+		// If an array has been submitted
+		if (is_array($path)) {
+			$path = implode(static::DS, $path);
+		}
 
 		// Make it an absolute path
 		$path = !static::isAbsolute($path)

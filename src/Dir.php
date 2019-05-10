@@ -50,7 +50,7 @@ class Dir extends Path {
 		}
 
 		// Find in this directory
-		$glob = glob($this->getPath() . "{{$globPattern},.[!.]*,..?*}", GLOB_BRACE);
+		$glob = glob($this->getPath() . $globPattern, GLOB_BRACE);
 		foreach ($glob as $i => $path) {
 
 			// Handle both files and directories
