@@ -33,6 +33,7 @@ class Dir extends Path {
 
 	/**
 	 * Get the paths in this directory.
+	 * Does not list hidden files (starting with a '.').
 	 *
 	 * @param string $globPattern Pattern for glob search.
 	 *

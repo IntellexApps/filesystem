@@ -276,8 +276,7 @@ $tests = [
 			(new Dir(ROOT . 'bucket'))->write($file);
 			return (new Dir(ROOT . 'bucket'))->listDirectory();
 		}, [
-			new File(__DIR__ . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'bucket' . DIRECTORY_SEPARATOR . 'security.log'),
-			new File(__DIR__ . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'bucket' . DIRECTORY_SEPARATOR . '.empty') ] ],
+			new File(__DIR__ . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'bucket' . DIRECTORY_SEPARATOR . 'security.log') ] ],
 	__LINE__ => [
 		function () {
 			(new Dir(ROOT . 'bucket'))->clear();
@@ -381,6 +380,7 @@ $tests = [
 			new Dir(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'sub1' . DIRECTORY_SEPARATOR . 'sub1-1' . DIRECTORY_SEPARATOR),
 			new Dir(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'sub1' . DIRECTORY_SEPARATOR . 'sub1-2' . DIRECTORY_SEPARATOR),
 			new File(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'sub1' . DIRECTORY_SEPARATOR . 'txt.txt'),
+			new File(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'sub1' . DIRECTORY_SEPARATOR . 'sub1-1' . DIRECTORY_SEPARATOR . '1-1.txt'),
 			new Dir(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'sub1' . DIRECTORY_SEPARATOR . 'sub1-2' . DIRECTORY_SEPARATOR . 'sub1-2-1' . DIRECTORY_SEPARATOR),
 			new File(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'sub1' . DIRECTORY_SEPARATOR . 'sub1-2' . DIRECTORY_SEPARATOR . 'sub1-2-1' . DIRECTORY_SEPARATOR . 'kola.txt'),
 			new File(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'sub2' . DIRECTORY_SEPARATOR . 'file'),
@@ -392,6 +392,7 @@ $tests = [
 		}, [
 			new File(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'level1.txt'),
 			new File(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'sub1' . DIRECTORY_SEPARATOR . 'txt.txt'),
+			new File(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'sub1' . DIRECTORY_SEPARATOR . 'sub1-1' . DIRECTORY_SEPARATOR . '1-1.txt'),
 			new File(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'sub1' . DIRECTORY_SEPARATOR . 'sub1-2' . DIRECTORY_SEPARATOR . 'sub1-2-1' . DIRECTORY_SEPARATOR . 'kola.txt'),
 			new File(ROOT . DIRECTORY_SEPARATOR . 'search' . DIRECTORY_SEPARATOR . 'sub2' . DIRECTORY_SEPARATOR . 'file.txt')
 		] ],
