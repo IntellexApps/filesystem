@@ -398,7 +398,13 @@ class File extends Path {
 	 */
 	public function delete() {
 		if ($this->exists() && $this->isWritable()) {
-			unlink($this->getPath());
+
+			// Try to skip the error log on failure
+			$errorLevel = error_reporting();
+			error_reporting($errorLevel & ~E_WARNING);
+			@unlink($this->getPath());
+			error_reporting($errorLevel);
+
 		} else {
 			throw new PathNotWritableException($this);
 		}

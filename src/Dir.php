@@ -155,8 +155,13 @@ class Dir extends Path {
 			}
 
 			// Create a directory
-			$success = mkdir($this->getPath(), 0775, true);
-			if (!$success) {
+			$errorLevel = error_reporting();
+			error_reporting($errorLevel & ~E_WARNING);
+			@mkdir($this->getPath(), 0775, true);
+			error_reporting($errorLevel);
+
+			// Make sure creation was successful
+			if (!$this->exists() || !$this->isWritable()) {
 				new PathNotWritableException($this->getPath());
 			}
 		}
