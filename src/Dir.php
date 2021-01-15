@@ -196,7 +196,7 @@ class Dir extends Path {
 	/**
 	 * Clears the directory content, but not the directory itself.
 	 *
-	 * @param string[] $exclude The array of regular expressions to match files or dirs to skip.
+	 * @param string|string[] $exclude The array of regular expressions to match files or dirs to skip.
 	 *
 	 * @throws NotADirectoryException
 	 * @throws PathNotReadableException
@@ -206,7 +206,7 @@ class Dir extends Path {
 		foreach ($paths as $path) {
 
 			// Exclude
-			foreach ($exclude as $regexp) {
+			foreach ((array) $exclude as $regexp) {
 				if (preg_match($regexp, $path->getName())) {
 					break;
 				}
