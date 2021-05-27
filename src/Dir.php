@@ -1,5 +1,6 @@
 <?php namespace Intellex\Filesystem;
 
+use Exception;
 use Intellex\Filesystem\Exception\InvalidArgumentException;
 use Intellex\Filesystem\Exception\NotADirectoryException;
 use Intellex\Filesystem\Exception\PathExistsException;
@@ -52,14 +53,14 @@ class Dir extends Path {
 
 		// Find in this directory
 		$glob = glob($this->getPath() . $globPattern, GLOB_BRACE);
-		foreach ($glob as $i => $path) {
+		foreach ($glob as $path) {
 
 			// Handle both files and directories
 			if (is_file($path)) {
 				$paths[] = new File($path);
 
 			} else {
-				$paths[] = $dir = new Dir($path);
+				$paths[] = new Dir($path);
 			}
 		}
 
@@ -155,10 +156,10 @@ class Dir extends Path {
 			}
 
 			// Create a directory
-			$errorLevel = error_reporting();
-			error_reporting($errorLevel & ~E_WARNING);
-			@mkdir($this->getPath(), 0775, true);
-			error_reporting($errorLevel);
+			static::disableErrorHanding();
+			$path = $this->getPath();
+			!file_exists($path) && @mkdir($path, 0775, true);
+			static::restoreErrorHanding();
 
 			// Make sure creation was successful
 			if (!$this->exists() || !$this->isWritable()) {
@@ -228,7 +229,7 @@ class Dir extends Path {
 	 * @throws PathNotWritableException If the directory is not writable.
 	 * @throws NotADirectoryException
 	 */
-	public function write(Path &$path, $overwrite = true) {
+	public function write(Path $path, $overwrite = true) {
 
 		// Validate that it is writable
 		if (!$this->isWritable()) {

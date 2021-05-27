@@ -6,7 +6,7 @@ if [ ! -f test.php ]; then
 	exit 255
 fi
 
-# Clear the tmp dir and copy everything from the skel directory
+# Clear the tmp dir and copy everything from the skeleton directory
 chmod 777 -R tmp/
 rm -rf tmp/*
 cp -r skel/* tmp/

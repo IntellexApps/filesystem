@@ -2,7 +2,6 @@
 
 use Intellex\Filesystem\Exception\NotADirectoryException;
 use Intellex\Filesystem\Exception\NotAFileException;
-use Intellex\Filesystem\Exception\UnsupportedOSException;
 
 /**
  * Class Path represents a path, which can be both Dir or File, or not even existing yet.
@@ -23,6 +22,9 @@ abstract class Path {
 	/** @var string Indicates that the underlying OS is Windows based. */
 	const OS_WIN = 'WIN';
 
+	/** @var int The last recorded error level to capture. */
+	protected static $errorLevel = 0;
+
 	/**
 	 * Get the underlying operating system.
 	 *
@@ -37,8 +39,6 @@ abstract class Path {
 		if (true) {
 			return static::OS_UNIX;
 		}
-
-		throw new UnsupportedOSException(PHP_OS);
 	}
 
 	/**
@@ -123,7 +123,7 @@ abstract class Path {
 	public static function isAbsolute($path) {
 		switch (static::getOS()) {
 			case static::OS_UNIX:
-				return $path{0} === static::DS;
+				return $path[0]=== static::DS;
 			case static::OS_WIN:
 				return preg_match('~^[A-Z]+:\\\\~', $path . '');
 		}
@@ -200,6 +200,23 @@ abstract class Path {
 	 */
 	public static function joinAsAbsolute($path) {
 		return static::getRoot() . implode(static::DS, $path);
+	}
+
+	/**
+	 * Disable active error handling.
+	 */
+	protected static function disableErrorHanding() {
+		static::$errorLevel = error_reporting();
+		error_reporting(0);
+		set_error_handler(function() { return true; });
+	}
+
+	/**
+	 * Restore original error handling.
+	 */
+	protected static function restoreErrorHanding() {
+		error_reporting(static::$errorLevel);
+		restore_error_handler();
 	}
 
 	/** @return string The path. */

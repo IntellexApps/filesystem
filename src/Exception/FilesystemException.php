@@ -1,5 +1,6 @@
 <?php namespace Intellex\Filesystem\Exception;
 
+use Exception;
 use Intellex\Filesystem\Path;
 
 /**
@@ -7,7 +8,7 @@ use Intellex\Filesystem\Path;
  *
  * @package Intellex\Filesystem\Exception
  */
-abstract class FilesystemException extends \Exception {
+abstract class FilesystemException extends Exception {
 
 	/**
 	 * Get the string path.

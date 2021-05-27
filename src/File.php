@@ -1,5 +1,6 @@
 <?php namespace Intellex\Filesystem;
 
+use Exception;
 use Intellex\Filesystem\Exception\NotADirectoryException;
 use Intellex\Filesystem\Exception\NotAFileException;
 use Intellex\Filesystem\Exception\PathExistsException;
@@ -14,10 +15,10 @@ use Mimey\MimeTypes;
  */
 class File extends Path {
 
-	/** @var int The full name of the file, with the extension. */
+	/** @var string The full name of the file, with the extension. */
 	private $basename;
 
-	/** @var int The name of the file, without the extension. */
+	/** @var string The name of the file, without the extension. */
 	private $filename;
 
 	/** @var int The file size, in bytes. */
@@ -27,7 +28,7 @@ class File extends Path {
 	private $extension;
 
 	/** @var string MIME type of the file. */
-	private $mimetype;
+	private $mimeType;
 
 	/** @var string The extension as parsed from the mime type of a file. */
 	private $mimeExtension;
@@ -41,14 +42,14 @@ class File extends Path {
 		$this->filename = null;
 		$this->size = null;
 		$this->extension = null;
-		$this->mimetype = null;
+		$this->mimeType = null;
 		$this->mimeExtension = null;
 	}
 
 	/**
 	 * Read from the file.
 	 *
-	 * @return mixed The content of the file.
+	 * @return string The content of the file.
 	 * @throws NotAFileException
 	 * @throws PathNotReadableException
 	 */
@@ -59,7 +60,17 @@ class File extends Path {
 			throw new PathNotReadableException($this);
 		}
 
-		return file_get_contents($this->getPath());
+		// Read the file
+		static::disableErrorHanding();
+		$fileContent = @file_get_contents($this->getPath());
+		static::restoreErrorHanding();
+
+		// Make sure the file is read properly
+		if ($fileContent === false) {
+			throw new PathNotReadableException($this);
+		}
+
+		return $fileContent;
 	}
 
 	/**
@@ -78,7 +89,15 @@ class File extends Path {
 			throw new PathNotWritableException($this);
 		}
 
-		file_put_contents($this->getPath(), $data, $append ? FILE_APPEND : 0);
+		// Write to file
+		static::disableErrorHanding();
+		$success = @file_put_contents($this->getPath(), $data, $append ? FILE_APPEND : 0);
+		static::restoreErrorHanding();
+
+		// Make sure the data is written properly
+		if ($success === false) {
+			throw new PathNotWritableException($this);
+		}
 	}
 
 	/**
@@ -225,13 +244,13 @@ class File extends Path {
 
 		// Only load additional info for existing files
 		try {
-			if ($this->exists() && ($this->mimetype === null || $this->mimeExtension === null || empty($this->size))) {
+			if ($this->exists() && ($this->mimeType === null || $this->mimeExtension === null || empty($this->size))) {
 				clearstatcache();
 				$this->size = filesize($this->getPath());
-				$this->mimetype = $this->parseMimeType();
-				$this->mimeExtension = static::validateMimeExtension($this->mimetype, $this->extension);
+				$this->mimeType = $this->parseMimeType();
+				$this->mimeExtension = static::validateMimeExtension($this->mimeType, $this->extension);
 			}
-		} catch (\Exception $ex) {
+		} catch (Exception $ex) {
 		}
 
 		return $this;
@@ -247,8 +266,16 @@ class File extends Path {
 
 		// User internal PHP function
 		if (function_exists('mime_content_type')) {
-			/** @noinspection PhpComposerExtensionStubsInspection */
-			return mime_content_type($path);
+			$mime = mime_content_type($path);
+
+			// Fix some known bugs on older versions of PHP: https://bugs.php.net/bug.php?id=79045
+			switch ($mime) {
+				case 'image/svg':
+					$mime = 'image/svg+xml';
+					break;
+			}
+
+			return $mime;
 		}
 
 		// Use the extension
@@ -320,15 +347,43 @@ class File extends Path {
 		return $this->load()->$var;
 	}
 
-	/** @return string Mimetype of the file. */
-	public function getMimetype() {
-		return $this->load()->mimetype;
+	/** @return string MimeType of the file. */
+	public function getMimeType() {
+		return $this->load()->mimeType;
 	}
 
-	/** @return int|null The time the file was last modified, in seconds since Unix epoch, or null on failure. */
+	/**
+	 * Get the last access time.
+	 *
+	 * @return int The time the file was last accessed, in seconds since Unix epoch.
+	 * @throws PathNotReadableException
+	 */
+	public function getLastAccessedTime() {
+		$time = fileatime($this->getPath());
+
+		// Make sure the data is read
+		if ($time === false) {
+			throw new PathNotReadableException($this);
+		}
+
+		return $time;
+	}
+
+	/**
+	 * Get the last modified time.
+	 *
+	 * @return int The time the file was last modified, in seconds since Unix epoch.
+	 * @throws PathNotReadableException
+	 */
 	public function getLastModifiedTime() {
 		$time = filemtime($this->getPath());
-		return $time ? $time : null;
+
+		// Make sure the data is read
+		if ($time === false) {
+			throw new PathNotReadableException($this);
+		}
+
+		return $time;
 	}
 
 	/**
@@ -381,11 +436,22 @@ class File extends Path {
 			throw new PathNotWritableException($this);
 		}
 
+		// Try to touch the parent directory
 		try {
 			$this->getParent()->touch();
 		} catch (NotADirectoryException $ex) {
 		}
-		touch($this->getPath());
+
+		// Touch the file
+		static::disableErrorHanding();
+		$success = @touch($this->getPath());
+		static::restoreErrorHanding();
+
+		// Make sure the touch was successful
+		if ($success === false) {
+			throw new PathNotWritableException($this);
+		}
+
 		return $this;
 	}
 
@@ -393,17 +459,21 @@ class File extends Path {
 	 * Delete the file from file system.
 	 *
 	 * @throws NotAFileException
-	 * @throws PathNotWritableException
 	 * @throws NotADirectoryException
+	 * @throws PathNotWritableException
 	 */
 	public function delete() {
 		if ($this->exists() && $this->isWritable()) {
 
-			// Try to skip the error log on failure
-			$errorLevel = error_reporting();
-			error_reporting($errorLevel & ~E_WARNING);
-			@unlink($this->getPath());
-			error_reporting($errorLevel);
+			// Delete the file
+			static::disableErrorHanding();
+			$success = @unlink($this->getPath());
+			static::restoreErrorHanding();
+
+			// Make sure the unlink was successful
+			if ($success === false) {
+				throw new PathNotWritableException($this);
+			}
 
 		} else {
 			throw new PathNotWritableException($this);

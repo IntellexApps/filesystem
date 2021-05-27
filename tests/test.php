@@ -1,18 +1,25 @@
 <?php define('START_TIME', microtime(true));
 
+use Intellex\Debugger\IncidentHandler;
+use Intellex\Debugger\VarDump;
 use Intellex\Filesystem\Dir;
+use Intellex\Filesystem\Exception\NotADirectoryException;
+use Intellex\Filesystem\Exception\NotAFileException;
+use Intellex\Filesystem\Exception\PathExistsException;
+use Intellex\Filesystem\Exception\PathNotReadableException;
+use Intellex\Filesystem\Exception\PathNotWritableException;
 use Intellex\Filesystem\File;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 // Initialize the exception handler and debug function
-\Intellex\Debugger\IncidentHandler::register();
+IncidentHandler::register();
 function debug($data) {
-	\Intellex\Debugger\VarDump::from($data, 1);
+	VarDump::from($data, 1);
 }
 
 // Prepare
-define('ROOT', __DIR__ . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR);
+const ROOT = __DIR__ . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR;
 function fail($reason) {
 	echo 'Test failed:' . PHP_EOL . $reason . PHP_EOL . PHP_EOL;
 	exit(1);
@@ -191,6 +198,11 @@ $tests = [
 			return (new File(ROOT . 'favicon.png'))->getMimetype();
 		},
 		'image/png' ],
+	__LINE__ => [
+		function () {
+			return (new File(ROOT . 'intellex.svg'))->getMimetype();
+		},
+		'image/svg+xml' ],
 	__LINE__ => [
 		function () {
 			return (new File(ROOT . 'favicon.png'))->getSize();
@@ -407,74 +419,74 @@ $tests = [
 	__LINE__ => [
 		function () {
 			(new File(ROOT . 'non-writable' . DIRECTORY_SEPARATOR . 'no-file'))->touch();
-		}, new \Intellex\Filesystem\Exception\PathNotWritableException(new File(ROOT . 'non-writable' . DIRECTORY_SEPARATOR . 'no-file')) ],
+		}, new PathNotWritableException(new File(ROOT . 'non-writable' . DIRECTORY_SEPARATOR . 'no-file')) ],
 	__LINE__ => [
 		function () {
 			(new File(ROOT . 'read-only'))->touch();
-		}, new \Intellex\Filesystem\Exception\PathNotWritableException(new File(ROOT . 'read-only')) ],
+		}, new PathNotWritableException(new File(ROOT . 'read-only')) ],
 	__LINE__ => [
 		function () {
 			(new File(ROOT . 'read-only'))->delete();
 		},
-		new \Intellex\Filesystem\Exception\PathNotWritableException(new File(ROOT . 'read-only')) ],
+		new PathNotWritableException(new File(ROOT . 'read-only')) ],
 	__LINE__ => [
 		function () {
 			(new File(ROOT . 'read-only'))->write('123');
 		},
-		new \Intellex\Filesystem\Exception\PathNotWritableException(new File(ROOT . 'read-only')) ],
+		new PathNotWritableException(new File(ROOT . 'read-only')) ],
 
 	__LINE__ => [
 		function () {
 			(new File(ROOT . 'no-file'))->moveTo(new Dir(ROOT . 'non-writable'));
 		},
-		new \Intellex\Filesystem\Exception\NotAFileException(new File(ROOT . 'no-file')) ],
+		new NotAFileException(new File(ROOT . 'no-file')) ],
 	__LINE__ => [
 		function () {
 			(new File(ROOT . 'read-only'))->moveTo(new Dir(ROOT . 'non-writable'));
 		},
-		new \Intellex\Filesystem\Exception\PathNotWritableException(new File(ROOT . 'read-only')) ],
+		new PathNotWritableException(new File(ROOT . 'read-only')) ],
 	__LINE__ => [
 		function () {
 			(new File(ROOT . 'security.log'))->moveTo(new Dir(ROOT . 'non-writable'));
 		},
-		new \Intellex\Filesystem\Exception\PathNotWritableException(new File(ROOT . 'non-writable' . DIRECTORY_SEPARATOR . 'security.log')) ],
+		new PathNotWritableException(new File(ROOT . 'non-writable' . DIRECTORY_SEPARATOR . 'security.log')) ],
 	__LINE__ => [
 		function () {
 			(new File(ROOT . 'no-file'))->copyTo(new Dir(ROOT . 'bucket'));
 		},
-		new \Intellex\Filesystem\Exception\NotAFileException(new File(ROOT . 'no-file')) ],
+		new NotAFileException(new File(ROOT . 'no-file')) ],
 	__LINE__ => [
 		function () {
 			(new File(ROOT . 'security.log'))->copyTo(new Dir(ROOT . 'non-writable'));
 		},
-		new \Intellex\Filesystem\Exception\PathNotWritableException(new File(ROOT . 'non-writable' . DIRECTORY_SEPARATOR . 'security.log')) ],
+		new PathNotWritableException(new File(ROOT . 'non-writable' . DIRECTORY_SEPARATOR . 'security.log')) ],
 	__LINE__ => [
 		function () {
 			(new File(ROOT . 'security.log'))->copyTo(new File(ROOT . 'read-only'));
 		},
-		new \Intellex\Filesystem\Exception\PathExistsException(new File(ROOT . 'read-only')) ],
+		new PathExistsException(new File(ROOT . 'read-only')) ],
 	__LINE__ => [
 		function () {
 			(new File(ROOT . 'security.log'))->copyTo(new File(ROOT . 'read-only'), true);
 		},
-		new \Intellex\Filesystem\Exception\PathNotWritableException(new File(ROOT . 'read-only')) ],
+		new PathNotWritableException(new File(ROOT . 'read-only')) ],
 
 	__LINE__ => [
 		function () {
 			(new Dir(ROOT . 'no-directory'))->delete();
-		}, new \Intellex\Filesystem\Exception\NotADirectoryException(new Dir(ROOT . 'no-directory')) ],
+		}, new NotADirectoryException(new Dir(ROOT . 'no-directory')) ],
 	__LINE__ => [
 		function () {
 			(new Dir(ROOT . 'non-writable'))->delete();
-		}, new \Intellex\Filesystem\Exception\PathNotWritableException(new Dir(ROOT . 'non-writable')) ],
+		}, new PathNotWritableException(new Dir(ROOT . 'non-writable')) ],
 	__LINE__ => [
 		function () {
 			(new Dir(ROOT . 'no-directory'))->listDirectory();
-		}, new \Intellex\Filesystem\Exception\PathNotReadableException(new Dir(ROOT . 'no-directory')) ],
+		}, new PathNotReadableException(new Dir(ROOT . 'no-directory')) ],
 	__LINE__ => [
 		function () {
 			(new Dir(ROOT . 'non-readable'))->listDirectory();
-		}, new \Intellex\Filesystem\Exception\PathNotReadableException(new Dir(ROOT . 'non-readable')) ],
+		}, new PathNotReadableException(new Dir(ROOT . 'non-readable')) ],
 
 ];
 foreach ($tests as $line => $test) {
@@ -490,7 +502,6 @@ foreach ($tests as $line => $test) {
 	if ($exception || key_exists(1, $test)) {
 
 		// Handle exceptions
-
 		if ($test[1] instanceof Exception) {
 			if ($exception === null || $test[1]->getMessage() !== $exception->getMessage()) {
 				$received = print_r($exception, true);
@@ -503,7 +514,7 @@ foreach ($tests as $line => $test) {
 
 			// Raise an exception
 			if ($exception !== null) {
-				fail("On line: {$line}: {$ex->getMessage()}");
+				fail("On line: {$line}: {$exception->getMessage()}");
 			}
 
 			// Compare the results

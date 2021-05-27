@@ -3,13 +3,14 @@
 * Full abstraction layer.
 * Supports both __files__ and __directories__.
 * Easily __read__, __write__ and __search__ for files and directories. 
-* All issues are casted to separate __exceptions__ for simple handling.
+* All issues are cast to separate __exceptions__ for simple handling.
 
 
 Examples
 --------------------
 
 ##### Initialize
+
 ```php
 <?php
 	$file = new File('echo.txt');

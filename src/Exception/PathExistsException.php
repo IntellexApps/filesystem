@@ -1,7 +1,7 @@
 <?php namespace Intellex\Filesystem\Exception;
 
 /**
- * Class PathNotFoundException indicates that the target path already exists.
+ * Class PathExistsException indicates that the target path already exists.
  *
  * @package Intellex\Filesystem\Exception
  */
