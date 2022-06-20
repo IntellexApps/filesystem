@@ -30,7 +30,7 @@ class File extends Path {
 	/** @var string MIME type of the file. */
 	private $mimeType;
 
-	/** @var string The extension as parsed from the mime type of a file. */
+	/** @var string The extension as parsed from the mime type of file. */
 	private $mimeExtension;
 
 	/** @inheritdoc */
@@ -146,7 +146,7 @@ class File extends Path {
 			$destination = new File($destination . static::DS . $this->getName());
 		}
 
-		// If source file does not exists
+		// If source file does not exist
 		if (!$this->exists()) {
 			throw new NotAFileException($this);
 		}
@@ -195,7 +195,7 @@ class File extends Path {
 			$destination = new File($destination . static::DS . $this->getName());
 		}
 
-		// If source file does not exists
+		// If source file does not exist
 		if (!$this->exists()) {
 			throw new NotAFileException($this);
 		}
@@ -470,7 +470,7 @@ class File extends Path {
 			$success = @unlink($this->getPath());
 			static::restoreErrorHanding();
 
-			// Make sure the unlink was successful
+			// Make sure to unlink was successful
 			if ($success === false) {
 				throw new PathNotWritableException($this);
 			}

@@ -1,6 +1,5 @@
 <?php namespace Intellex\Filesystem;
 
-use Exception;
 use Intellex\Filesystem\Exception\InvalidArgumentException;
 use Intellex\Filesystem\Exception\NotADirectoryException;
 use Intellex\Filesystem\Exception\PathExistsException;
@@ -52,7 +51,7 @@ class Dir extends Path {
 		}
 
 		// Find in this directory
-		$glob = glob($this->getPath() . $globPattern, GLOB_BRACE);
+		$glob = glob($this->getPath() . $globPattern, defined('GLOB_BRACE') ? GLOB_BRACE : 0);
 		foreach ($glob as $path) {
 
 			// Handle both files and directories
@@ -225,7 +224,7 @@ class Dir extends Path {
 	 *
 	 * @return Path Itself, for chaining purposes.
 	 * @throws InvalidArgumentException When something other than File or Dir is supplied.
-	 * @throws PathExistsException If the destination exists and we do not want to overwrite it.
+	 * @throws PathExistsException If the destination exists, and we do not want to overwrite it.
 	 * @throws PathNotWritableException If the directory is not writable.
 	 * @throws NotADirectoryException
 	 */
